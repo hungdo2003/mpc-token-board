@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { usersApi } from "../../services/api";
 import { ethers } from "ethers";
+import { useAuth } from "../../context/AuthContext";
+import { usersApi } from "../../services/api";
 
 declare global {
-  interface Window {
-    ethereum?: any;
-  }
+  interface Window { ethereum?: any; }
 }
 
 export function Header() {
@@ -22,7 +21,7 @@ export function Header() {
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      alert("MetaMask not detected. Please install MetaMask.");
+      toast.error("MetaMask not detected. Please install MetaMask.");
       return;
     }
     setConnecting(true);
@@ -33,16 +32,16 @@ export function Header() {
       const address = await signer.getAddress();
       await usersApi.updateWallet(address);
       await refreshUser();
+      toast.success("Wallet connected");
     } catch (err: any) {
-      alert(err.message || "Failed to connect wallet");
+      toast.error(err.response?.data?.error || err.message || "Failed to connect wallet");
     } finally {
       setConnecting(false);
     }
   };
 
-  const shortAddr = user?.walletAddress
-    ? `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}`
-    : null;
+  const addr = user?.wallet_address;
+  const shortAddr = addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : null;
 
   return (
     <header className="h-14 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6">
@@ -64,10 +63,15 @@ export function Header() {
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">{user?.email}</span>
           {user?.role === "admin" && (
-            <span className="text-xs bg-violet-600/30 text-violet-400 px-2 py-0.5 rounded-full">Admin</span>
+            <span className="text-xs bg-violet-600/30 text-violet-400 px-2 py-0.5 rounded-full">
+              Admin
+            </span>
           )}
         </div>
-        <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-red-400 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="text-sm text-gray-500 hover:text-red-400 transition-colors"
+        >
           Logout
         </button>
       </div>

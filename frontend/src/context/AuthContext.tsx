@@ -1,16 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { authApi } from "../services/api";
+import { authApi, tokenStore } from "../services/api";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role: string;
-  walletAddress: string | null;
+  wallet_address: string | null;
+  status: string;
+  created_at: string;
 }
 
 interface AuthContextValue {
   user: User | null;
-  token: string | null;
   isLoading: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -22,39 +23,39 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
     try {
       const { data } = await authApi.me();
-      setUser(data.user);
+      setUser(data.data.user);
     } catch {
       setUser(null);
-      setToken(null);
-      localStorage.removeItem("token");
+      tokenStore.clear();
     }
   }, []);
 
+  // On mount: if we have a stored token try to load the user; otherwise try
+  // a silent refresh via cookie (covers page reload after token expiry)
   useEffect(() => {
-    if (token) {
+    const stored = tokenStore.get();
+    if (stored) {
       refreshUser().finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
-  }, [token, refreshUser]);
+  }, [refreshUser]);
 
   const login = async (email: string, password: string) => {
     const { data } = await authApi.login(email, password);
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    setUser(data.user);
+    const { accessToken, user: loggedInUser } = data.data;
+    tokenStore.set(accessToken);
+    setUser(loggedInUser);
   };
 
   const logout = async () => {
     try { await authApi.logout(); } catch {}
-    localStorage.removeItem("token");
-    setToken(null);
+    tokenStore.clear();
     setUser(null);
   };
 
@@ -62,7 +63,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
         isLoading,
         isAdmin: user?.role === "admin",
         login,

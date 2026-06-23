@@ -1,31 +1,79 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:4000/api",
-});
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
 
-// Attach JWT token to every request
+const api = axios.create({ baseURL: BASE_URL, withCredentials: true });
+
+// ─── Token management ─────────────────────────────────────────────────────────
+
+export const tokenStore = {
+  get: ()           => localStorage.getItem("accessToken"),
+  set: (t: string)  => localStorage.setItem("accessToken", t),
+  clear: ()         => localStorage.removeItem("accessToken"),
+};
+
+// ─── Request: attach access token ─────────────────────────────────────────────
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = tokenStore.get();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Redirect to login on 401
+// ─── Response: auto-refresh on 401 ────────────────────────────────────────────
+
+let isRefreshing = false;
+let waitQueue: Array<{ resolve: (t: string) => void; reject: (e: any) => void }> = [];
+
+function processQueue(err: any, token: string | null) {
+  waitQueue.forEach((p) => (err ? p.reject(err) : p.resolve(token!)));
+  waitQueue = [];
+}
+
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+  async (err) => {
+    const original = err.config;
+    if (err.response?.status !== 401 || original._retry) {
+      return Promise.reject(err);
     }
-    return Promise.reject(err);
+    original._retry = true;
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        waitQueue.push({ resolve, reject });
+      }).then((token) => {
+        original.headers.Authorization = `Bearer ${token}`;
+        return api(original);
+      });
+    }
+
+    isRefreshing = true;
+    try {
+      const { data } = await axios.post(
+        `${BASE_URL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      );
+      const newToken: string = data.data.accessToken;
+      tokenStore.set(newToken);
+      processQueue(null, newToken);
+      original.headers.Authorization = `Bearer ${newToken}`;
+      return api(original);
+    } catch (refreshErr) {
+      processQueue(refreshErr, null);
+      tokenStore.clear();
+      window.location.href = "/login";
+      return Promise.reject(refreshErr);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 
 export default api;
 
-// ─── Auth ────────────────────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export const authApi = {
   login: (email: string, password: string) =>
@@ -34,9 +82,11 @@ export const authApi = {
     api.post("/auth/register", { email, password }),
   logout: () => api.post("/auth/logout"),
   me: () => api.get("/auth/me"),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.patch("/auth/change-password", { currentPassword, newPassword }),
 };
 
-// ─── Users ───────────────────────────────────────────────────────────────────
+// ─── Users ────────────────────────────────────────────────────────────────────
 
 export const usersApi = {
   list: (params?: { page?: number; limit?: number; search?: string }) =>
@@ -48,10 +98,11 @@ export const usersApi = {
     api.patch(`/users/${id}/status`, { status }),
 };
 
-// ─── Tokens ──────────────────────────────────────────────────────────────────
+// ─── Tokens ───────────────────────────────────────────────────────────────────
 
 export const tokensApi = {
-  list: (all?: boolean) => api.get("/tokens", { params: { all: all ? "true" : undefined } }),
+  list: (all?: boolean) =>
+    api.get("/tokens", { params: all ? { all: "true" } : undefined }),
   getById: (id: string) => api.get(`/tokens/${id}`),
   add: (data: { name: string; symbol: string; contractAddress: string; decimals: number }) =>
     api.post("/tokens", data),
@@ -60,7 +111,7 @@ export const tokensApi = {
   disable: (id: string) => api.delete(`/tokens/${id}`),
 };
 
-// ─── Transfers ───────────────────────────────────────────────────────────────
+// ─── Transfers ────────────────────────────────────────────────────────────────
 
 export const transfersApi = {
   sendByAddress: (tokenId: string, recipient: string, amount: string) =>
@@ -75,15 +126,18 @@ export const transfersApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
-  list: (params?: { page?: number; limit?: number; status?: string; recipient?: string; tokenId?: string }) =>
-    api.get("/transfers", { params }),
+  list: (params?: {
+    page?: number; limit?: number;
+    status?: string; recipient?: string; tokenId?: string;
+  }) => api.get("/transfers", { params }),
   getById: (id: string) => api.get(`/transfers/${id}`),
 };
 
-// ─── Dashboard ───────────────────────────────────────────────────────────────
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export const dashboardApi = {
   stats: () => api.get("/dashboard/stats"),
-  auditLogs: (params?: { page?: number; limit?: number; action?: string; userId?: string }) =>
-    api.get("/dashboard/audit-logs", { params }),
+  auditLogs: (params?: {
+    page?: number; limit?: number; action?: string; userId?: string;
+  }) => api.get("/dashboard/audit-logs", { params }),
 };
