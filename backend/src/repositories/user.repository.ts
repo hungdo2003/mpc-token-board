@@ -41,7 +41,15 @@ export const UserRepository = {
     ]);
   },
 
-  async findAll(opts: ListUsersOptions): Promise<{ users: UserPublic[]; total: number }> {
+  async setWallet(id: string, walletAddress: string | null): Promise<UserPublic | null> {
+    return queryOne<UserPublic>(
+      `UPDATE users SET wallet_address = $1 WHERE id = $2
+       RETURNING id, email, role, wallet_address, status, created_at`,
+      [walletAddress ? walletAddress.toLowerCase() : null, id]
+    );
+  },
+
+  async findAll(opts: ListUsersOptions): Promise<{ rows: UserPublic[]; total: number }> {
     const offset = (opts.page - 1) * opts.limit;
     const params: unknown[] = [];
     let where = "";
@@ -64,7 +72,7 @@ export const UserRepository = {
       params
     );
 
-    return { users, total: Number(count) };
+    return { rows: users, total: Number(count) };
   },
 
   async create(email: string, passwordHash: string): Promise<UserPublic> {
