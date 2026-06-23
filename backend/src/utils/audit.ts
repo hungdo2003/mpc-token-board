@@ -1,5 +1,10 @@
-import { query } from "../db";
 import { Request } from "express";
+import { AuditLogRepository } from "../repositories/auditLog.repository";
+
+function getIp(req: Request): string | null {
+  const forwarded = req.headers["x-forwarded-for"] as string | undefined;
+  return forwarded?.split(",")[0].trim() ?? req.socket.remoteAddress ?? null;
+}
 
 export async function auditLog(
   userId: string | null,
@@ -7,12 +12,10 @@ export async function auditLog(
   description: string,
   req?: Request
 ): Promise<void> {
-  const ip = req
-    ? (req.headers["x-forwarded-for"] as string)?.split(",")[0].trim() || req.socket.remoteAddress || null
-    : null;
-
-  await query(
-    `INSERT INTO audit_logs (user_id, action, description, ip_address) VALUES ($1, $2, $3, $4)`,
-    [userId, action, description, ip]
-  );
+  await AuditLogRepository.create({
+    userId,
+    action,
+    description,
+    ipAddress: req ? getIp(req) : null,
+  });
 }
