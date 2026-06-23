@@ -1,0 +1,15 @@
+{
+  "name": "mpc-token-board",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "contracts:node": "cd contracts && npm run node",
+    "contracts:compile": "cd contracts && npm run compile",
+    "contracts:deploy:local": "cd contracts && npm run deploy:local",
+    "contracts:test": "cd contracts && npm test",
+    "frontend:start": "cd frontend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "dev": "start npm run contracts:node && timeout /t 3 && npm run contracts:deploy:local && npm run frontend:start"
+  },
+  "description": "MPC automated token rewards for on-chain chat board"
+}

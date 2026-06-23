@@ -1,0 +1,19 @@
+node_modules/
+.env
+.env.local
+dist/
+build/
+
+# Hardhat
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+contracts/deployment.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
