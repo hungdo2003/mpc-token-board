@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
@@ -16,9 +17,11 @@ export function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
+      toast.success("Welcome back!");
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Login failed");
+      const msg = err.response?.data?.error || "Login failed";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -41,7 +44,8 @@ export function LoginPage() {
                 className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                placeholder="admin@mpcboard.io"
+                autoComplete="email"
                 required
               />
             </div>
@@ -53,12 +57,15 @@ export function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                autoComplete="current-password"
                 required
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-900/30 px-3 py-2 rounded-lg">{error}</p>
+              <p className="text-sm text-red-400 bg-red-900/30 px-3 py-2 rounded-lg">
+                {error}
+              </p>
             )}
 
             <button type="submit" className="btn-primary w-full" disabled={loading}>
@@ -67,7 +74,7 @@ export function LoginPage() {
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-4">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link to="/register" className="text-violet-400 hover:underline">
               Register
             </Link>

@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout/Layout";
@@ -17,22 +18,29 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: { background: "#1f2937", color: "#f3f4f6", border: "1px solid #374151" },
+            success: { iconTheme: { primary: "#8b5cf6", secondary: "#fff" } },
+          }}
+        />
         <Routes>
           {/* Public */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/"         element={<Navigate to="/dashboard" replace />} />
 
           {/* Protected layout */}
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard"    element={<DashboardPage />} />
             <Route path="/transactions" element={<TransactionHistoryPage />} />
 
             {/* Admin only */}
-            <Route path="/transfer" element={<ProtectedRoute adminOnly><SendTokenPage /></ProtectedRoute>} />
-            <Route path="/bulk" element={<ProtectedRoute adminOnly><BulkDistributePage /></ProtectedRoute>} />
-            <Route path="/tokens" element={<ProtectedRoute adminOnly><TokensPage /></ProtectedRoute>} />
-            <Route path="/users" element={<ProtectedRoute adminOnly><UsersPage /></ProtectedRoute>} />
+            <Route path="/transfer"  element={<ProtectedRoute adminOnly><SendTokenPage /></ProtectedRoute>} />
+            <Route path="/bulk"      element={<ProtectedRoute adminOnly><BulkDistributePage /></ProtectedRoute>} />
+            <Route path="/tokens"    element={<ProtectedRoute adminOnly><TokensPage /></ProtectedRoute>} />
+            <Route path="/users"     element={<ProtectedRoute adminOnly><UsersPage /></ProtectedRoute>} />
             <Route path="/audit-logs" element={<ProtectedRoute adminOnly><AuditLogsPage /></ProtectedRoute>} />
           </Route>
 
