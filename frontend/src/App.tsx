@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
+import { WalletProvider } from "./context/WalletContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout/Layout";
 import { LoginPage } from "./pages/LoginPage";
@@ -17,6 +18,7 @@ import { AuditLogsPage } from "./pages/AuditLogsPage";
 function App() {
   return (
     <AuthProvider>
+      <WalletProvider>
       <BrowserRouter>
         <Toaster
           position="top-right"
@@ -47,6 +49,7 @@ function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
+      </WalletProvider>
     </AuthProvider>
   );
 }

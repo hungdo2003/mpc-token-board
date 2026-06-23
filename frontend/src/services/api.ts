@@ -94,6 +94,7 @@ export const usersApi = {
   getById: (id: string) => api.get(`/users/${id}`),
   updateWallet: (walletAddress: string) =>
     api.patch("/users/me/wallet", { walletAddress }),
+  removeWallet: () => api.delete("/users/me/wallet"),
   updateStatus: (id: string, status: string) =>
     api.patch(`/users/${id}/status`, { status }),
 };
