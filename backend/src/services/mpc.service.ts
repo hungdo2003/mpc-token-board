@@ -19,7 +19,7 @@ const DISTRIBUTOR_ABI = [
 
 export class MpcService {
   private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
+  private wallet: ethers.Wallet | ethers.HDNodeWallet;
   private distributor: ethers.Contract;
 
   constructor() {

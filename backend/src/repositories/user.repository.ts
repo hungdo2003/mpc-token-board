@@ -91,4 +91,11 @@ export const UserRepository = {
       [status, id]
     );
   },
+
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await query(
+      `UPDATE users SET password_hash = $1 WHERE id = $2`,
+      [passwordHash, id]
+    );
+  },
 };

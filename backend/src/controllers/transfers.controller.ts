@@ -184,7 +184,7 @@ export async function sendBulk(req: Request, res: Response): Promise<void> {
 
     try {
       const amountWei = ethers.parseUnits(row.amount, token.decimals);
-      resolved.push({ recipient, amount: row.amount, amountWei });
+      resolved.push({ recipient: recipient!, amount: row.amount, amountWei });
     } catch {
       errors.push(`Row ${rowNum}: Amount parse error "${row.amount}"`);
     }
