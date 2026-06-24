@@ -414,7 +414,7 @@ git push
 
 ---
 
-# Day 14 - Dashboard & Transaction History
+# Day 14 - Dashboard & Transaction History ✅ DONE
 
 ## Tasks
 
