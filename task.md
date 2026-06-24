@@ -275,7 +275,7 @@ git push
 
 ---
 
-# Day 9 - Deploy Contract to Sepolia
+# Day 9 - Deploy Contract to Sepolia ✅ DONE
 
 ## Tasks
 
@@ -301,7 +301,7 @@ git push
 
 ---
 
-# Day 10 - Token Management Module
+# Day 10 - Token Management Module ✅ DONE
 
 ## Tasks
 
