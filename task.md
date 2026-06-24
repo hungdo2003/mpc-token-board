@@ -329,7 +329,7 @@ git push
 
 ---
 
-# Day 11 - Send Token by Wallet Address
+# Day 11 - Send Token by Wallet Address ✅ DONE
 
 ## Tasks
 
