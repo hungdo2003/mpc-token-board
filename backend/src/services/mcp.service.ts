@@ -2,10 +2,10 @@ import { ethers } from "ethers";
 import { config } from "../config";
 
 /**
- * MPC Service — pluggable signing abstraction.
+ * MCP Service — pluggable signing abstraction.
  *
- * Current implementation: Mock MPC using a single ethers.Wallet (development only).
- * Replace signTransaction() internals with your chosen MPC provider:
+ * Current implementation: Mock MCP using a single ethers.Wallet (development only).
+ * Replace signTransaction() internals with your chosen MCP provider:
  *   - Fireblocks:  https://developers.fireblocks.com/
  *   - Lit Protocol: https://developer.litprotocol.com/
  *   - Coinbase CDP: https://docs.cdp.coinbase.com/
@@ -17,7 +17,7 @@ const DISTRIBUTOR_ABI = [
   "function distributeBatch(address tokenAddress, address[] calldata recipients, uint256[] calldata amounts, bytes32 requestId) external",
 ];
 
-export class MpcService {
+export class McpService {
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet | ethers.HDNodeWallet;
   private distributor: ethers.Contract;
@@ -25,12 +25,12 @@ export class MpcService {
   constructor() {
     this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
 
-    if (!config.mpcPrivateKey) {
+    if (!config.mcpPrivateKey) {
       // Warn but don't crash on startup — will fail at transfer time
-      console.warn("[MPC] Warning: MPC_PRIVATE_KEY not set. Transfers will fail.");
+      console.warn("[MCP] Warning: MCP_PRIVATE_KEY not set. Transfers will fail.");
       this.wallet = ethers.Wallet.createRandom().connect(this.provider);
     } else {
-      this.wallet = new ethers.Wallet(config.mpcPrivateKey, this.provider);
+      this.wallet = new ethers.Wallet(config.mcpPrivateKey, this.provider);
     }
 
     this.distributor = new ethers.Contract(
@@ -89,4 +89,4 @@ export class MpcService {
   }
 }
 
-export const mpcService = new MpcService();
+export const mcpService = new McpService();

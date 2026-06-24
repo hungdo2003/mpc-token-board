@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { z } from "zod";
 import { UserRepository } from "../repositories/user.repository";
 import { AuditLogRepository } from "../repositories/auditLog.repository";
-import { success, paginated, fail } from "../utils/response";
+import { success, fail } from "../utils/response";
 
 const WalletSchema = z.object({
   walletAddress: z
@@ -24,7 +24,7 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
     const search = req.query.search as string | undefined;
 
     const { rows, total } = await UserRepository.findAll({ page, limit, search });
-    paginated(res, rows, total, page, limit);
+    res.json({ users: rows, total, page, limit });
   } catch (err) { next(err); }
 }
 

@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title TokenDistributor
- * @dev Distributes ERC-20 tokens to recipients via MPC-signed transactions.
+ * @dev Distributes ERC-20 tokens to recipients via MCP-signed transactions.
  *      Tokens must be deposited into this contract before distribution.
  */
 contract TokenDistributor is AccessControl, Pausable, ReentrancyGuard {
@@ -43,7 +43,7 @@ contract TokenDistributor is AccessControl, Pausable, ReentrancyGuard {
     // ─── Core Distribution ────────────────────────────────────────────────────
 
     /**
-     * @dev Transfer tokens to a single recipient. Called by the MPC operator wallet.
+     * @dev Transfer tokens to a single recipient. Called by the MCP operator wallet.
      */
     function distributeToken(
         address tokenAddress,

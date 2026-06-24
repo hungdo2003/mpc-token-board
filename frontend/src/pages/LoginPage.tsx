@@ -31,7 +31,7 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-violet-400">MPC Token Board</h1>
+          <h1 className="text-2xl font-bold text-violet-400">MCP Token Board</h1>
           <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
         </div>
 
@@ -44,7 +44,7 @@ export function LoginPage() {
                 className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@mpcboard.io"
+                placeholder="admin@mcpboard.io"
                 autoComplete="email"
                 required
               />

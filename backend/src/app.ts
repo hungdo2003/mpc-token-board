@@ -5,6 +5,7 @@ validateEnv();
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import { config } from "./config";
 import { globalLimiter } from "./middleware/rateLimiter";
 import { requestLogger } from "./middleware/requestLogger";
@@ -31,6 +32,7 @@ app.use(cors({
 // ─── Parsing ─────────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(requestLogger);
@@ -62,7 +64,7 @@ app.listen(config.port, () => {
   logger.info(`Server started`, {
     port: config.port,
     env: config.nodeEnv,
-    mpc: config.mpcPrivateKey ? "configured" : "not set",
+    mcp: config.mcpPrivateKey ? "configured" : "not set",
     distributor: config.distributorAddress || "not set",
   });
 });

@@ -93,7 +93,7 @@ export function BulkDistributePage() {
           )}
 
           <button type="submit" className="btn-primary w-full" disabled={loading || !tokenId || !file}>
-            {loading ? `Processing batch via MPC...` : "Execute Bulk Transfer"}
+            {loading ? `Processing batch via MCP...` : "Execute Bulk Transfer"}
           </button>
         </form>
       </div>
