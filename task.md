@@ -219,7 +219,7 @@ git push
 
 ---
 
-# Day 7 - Smart Contract Development
+# Day 7 - Smart Contract Development ✅ DONE
 
 ## Tasks
 

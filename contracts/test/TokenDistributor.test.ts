@@ -229,6 +229,131 @@ describe("TokenDistributor", () => {
     });
   });
 
+  // ─── depositTokens ───────────────────────────────────────────────────────
+
+  describe("depositTokens", () => {
+    it("emits TokensDeposited event", async () => {
+      const amount = ethers.parseEther("500");
+      await token.approve(await distributor.getAddress(), amount);
+      await expect(distributor.depositTokens(await token.getAddress(), amount))
+        .to.emit(distributor, "TokensDeposited")
+        .withArgs(await token.getAddress(), admin.address, amount);
+    });
+
+    it("increases contract token balance", async () => {
+      const before = await distributor.getTokenBalance(await token.getAddress());
+      const amount = ethers.parseEther("200");
+      await token.approve(await distributor.getAddress(), amount);
+      await distributor.depositTokens(await token.getAddress(), amount);
+      expect(await distributor.getTokenBalance(await token.getAddress())).to.equal(before + amount);
+    });
+
+    it("reverts on zero address token", async () => {
+      await expect(
+        distributor.depositTokens(ethers.ZeroAddress, 100n)
+      ).to.be.revertedWith("Invalid token address");
+    });
+
+    it("reverts on zero amount", async () => {
+      await expect(
+        distributor.depositTokens(await token.getAddress(), 0n)
+      ).to.be.revertedWith("Amount must be greater than 0");
+    });
+  });
+
+  // ─── distributeBatch — extra guards ──────────────────────────────────────
+
+  describe("distributeBatch — extra guards", () => {
+    it("reverts on zero address in recipients array", async () => {
+      await expect(
+        distributor
+          .connect(operator)
+          .distributeBatch(
+            await token.getAddress(),
+            [recipient1.address, ethers.ZeroAddress],
+            [100n, 200n],
+            requestId
+          )
+      ).to.be.revertedWith("Invalid recipient");
+    });
+
+    it("reverts on zero amount in amounts array", async () => {
+      await expect(
+        distributor
+          .connect(operator)
+          .distributeBatch(
+            await token.getAddress(),
+            [recipient1.address, recipient2.address],
+            [100n, 0n],
+            requestId
+          )
+      ).to.be.revertedWith("Amount must be greater than 0");
+    });
+
+    it("reverts on zero address token", async () => {
+      await expect(
+        distributor
+          .connect(operator)
+          .distributeBatch(ethers.ZeroAddress, [recipient1.address], [100n], requestId)
+      ).to.be.revertedWith("Invalid token address");
+    });
+
+    it("reverts when paused", async () => {
+      await distributor.pause();
+      await expect(
+        distributor
+          .connect(operator)
+          .distributeBatch(
+            await token.getAddress(),
+            [recipient1.address],
+            [100n],
+            requestId
+          )
+      ).to.be.reverted;
+    });
+  });
+
+  // ─── emergencyWithdraw — extra guards ────────────────────────────────────
+
+  describe("emergencyWithdraw — extra guards", () => {
+    it("reverts on zero address token", async () => {
+      await expect(
+        distributor.emergencyWithdraw(ethers.ZeroAddress, admin.address, 100n)
+      ).to.be.revertedWith("Invalid token address");
+    });
+
+    it("reverts on zero destination address", async () => {
+      await expect(
+        distributor.emergencyWithdraw(await token.getAddress(), ethers.ZeroAddress, 100n)
+      ).to.be.revertedWith("Invalid destination");
+    });
+
+    it("reverts on zero amount", async () => {
+      await expect(
+        distributor.emergencyWithdraw(await token.getAddress(), admin.address, 0n)
+      ).to.be.revertedWith("Amount must be greater than 0");
+    });
+  });
+
+  // ─── pause / unpause — resume transfers ──────────────────────────────────
+
+  describe("pause / unpause — resume", () => {
+    it("transfers succeed again after unpause", async () => {
+      await distributor.pause();
+      await distributor.unpause();
+      const amount = ethers.parseEther("10");
+      await distributor
+        .connect(operator)
+        .distributeToken(await token.getAddress(), recipient1.address, amount, requestId);
+      expect(await token.balanceOf(recipient1.address)).to.equal(amount);
+    });
+
+    it("non-admin cannot unpause", async () => {
+      await distributor.pause();
+      await expect(distributor.connect(stranger).unpause()).to.be.reverted;
+    });
+  });
+
   // ─── Access Control ───────────────────────────────────────────────────────
 
   describe("Access Control", () => {
@@ -240,6 +365,25 @@ describe("TokenDistributor", () => {
     it("admin can revoke operator role", async () => {
       await distributor.revokeRole(OPERATOR_ROLE, operator.address);
       expect(await distributor.hasRole(OPERATOR_ROLE, operator.address)).to.be.false;
+    });
+  });
+
+  // ─── MockERC20 ────────────────────────────────────────────────────────────
+
+  describe("MockERC20", () => {
+    it("returns correct decimals", async () => {
+      expect(await token.decimals()).to.equal(18);
+    });
+
+    it("owner can mint additional tokens", async () => {
+      const before = await token.balanceOf(admin.address);
+      const amount = ethers.parseEther("1000");
+      await token.mint(admin.address, amount);
+      expect(await token.balanceOf(admin.address)).to.equal(before + amount);
+    });
+
+    it("non-owner cannot mint", async () => {
+      await expect(token.connect(stranger).mint(stranger.address, 100n)).to.be.reverted;
     });
   });
 });
