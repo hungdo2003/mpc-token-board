@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { query, queryOne } from "../db";
+import { mcpService } from "../services/mcp.service";
 
 export async function getStats(req: Request, res: Response): Promise<void> {
   const [
@@ -45,6 +46,11 @@ export async function getStats(req: Request, res: Response): Promise<void> {
     recentTransactions: recentTx,
     dailyActivity: dailyRow,
   });
+}
+
+export async function getMcpStatus(_req: Request, res: Response): Promise<void> {
+  const status = await mcpService.getStatus();
+  res.json({ mcp: status });
 }
 
 export async function listAuditLogs(req: Request, res: Response): Promise<void> {
