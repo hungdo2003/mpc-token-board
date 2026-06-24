@@ -129,7 +129,7 @@ export function SendTokenPage() {
           )}
 
           <button type="submit" className="btn-primary w-full" disabled={loading || !tokenId}>
-            {loading ? "Processing via MPC..." : "Send Tokens"}
+            {loading ? "Processing via MCP..." : "Send Tokens"}
           </button>
         </form>
       </div>

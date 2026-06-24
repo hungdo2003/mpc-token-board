@@ -18,7 +18,7 @@ export function Sidebar() {
   return (
     <aside className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col min-h-screen">
       <div className="px-6 py-5 border-b border-gray-800">
-        <h1 className="text-lg font-bold text-violet-400">MPC Token Board</h1>
+        <h1 className="text-lg font-bold text-violet-400">MCP Token Board</h1>
         <p className="text-xs text-gray-500 mt-0.5">Distribution System</p>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">

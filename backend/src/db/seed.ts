@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAIL    = process.env.SEED_ADMIN_EMAIL    || "admin@mpcboard.io";
+const ADMIN_EMAIL    = process.env.SEED_ADMIN_EMAIL    || "admin@mcpboard.io";
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || "Admin@123456";
 
 // Sepolia testnet token addresses (real verified contracts)

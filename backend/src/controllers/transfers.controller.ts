@@ -4,7 +4,7 @@ import { z } from "zod";
 import { parse as parseCsv } from "csv-parse/sync";
 import { v4 as uuidv4 } from "uuid";
 import { query, queryOne } from "../db";
-import { mpcService } from "../services/mpc.service";
+import { mcpService } from "../services/mcp.service";
 import { auditLog } from "../utils/audit";
 
 const TransferByAddressSchema = z.object({
@@ -32,7 +32,7 @@ async function executeTransfer(
   if (!token) throw new Error("Token not found or disabled");
 
   const amountWei = ethers.parseUnits(amount, token.decimals);
-  const sender = mpcService.getOperatorAddress();
+  const sender = mcpService.getOperatorAddress();
   const requestId = uuidv4();
 
   // Create pending transaction record
@@ -43,7 +43,7 @@ async function executeTransfer(
   const txId = tx.id;
 
   try {
-    const txHash = await mpcService.distributeToken(
+    const txHash = await mcpService.distributeToken(
       token.contract_address,
       recipient,
       amountWei,
@@ -195,7 +195,7 @@ export async function sendBulk(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const sender = mpcService.getOperatorAddress();
+  const sender = mcpService.getOperatorAddress();
   const requestId = uuidv4();
 
   // Insert pending transactions
@@ -210,7 +210,7 @@ export async function sendBulk(req: Request, res: Response): Promise<void> {
 
   // Execute batch on-chain
   try {
-    const txHash = await mpcService.distributeBatch(
+    const txHash = await mcpService.distributeBatch(
       token.contract_address,
       resolved.map((r) => r.recipient),
       resolved.map((r) => r.amountWei),

@@ -1,5 +1,5 @@
 {
-  "name": "mpc-token-board",
+  "name": "mcp-token-board",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -11,5 +11,5 @@
     "frontend:build": "cd frontend && npm run build",
     "dev": "start npm run contracts:node && timeout /t 3 && npm run contracts:deploy:local && npm run frontend:start"
   },
-  "description": "MPC automated token rewards for on-chain chat board"
+  "description": "MCP automated token rewards for on-chain chat board"
 }

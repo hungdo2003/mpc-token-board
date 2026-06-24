@@ -1,5 +1,5 @@
 {
-  "name": "mpc-token-board-backend",
+  "name": "mcp-token-board-backend",
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {

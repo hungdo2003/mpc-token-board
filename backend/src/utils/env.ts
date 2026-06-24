@@ -14,7 +14,7 @@ export function validateEnv(): void {
 
   const optional: Array<{ key: string; impact: string }> = [
     { key: "RPC_URL",            impact: "Blockchain transfers will fail" },
-    { key: "MPC_PRIVATE_KEY",    impact: "Token transfers via MPC will fail" },
+    { key: "MCP_PRIVATE_KEY",    impact: "Token transfers via MCP will fail" },
     { key: "DISTRIBUTOR_ADDRESS", impact: "TokenDistributor contract not set" },
   ];
 
