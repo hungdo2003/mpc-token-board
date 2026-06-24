@@ -138,6 +138,7 @@ export const transfersApi = {
 
 export const dashboardApi = {
   stats: () => api.get("/dashboard/stats"),
+  mcpStatus: () => api.get("/dashboard/mcp-status"),
   auditLogs: (params?: {
     page?: number; limit?: number; action?: string; userId?: string;
   }) => api.get("/dashboard/audit-logs", { params }),
