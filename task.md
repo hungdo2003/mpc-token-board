@@ -16,7 +16,7 @@ Estimated: 15 Working Days
 
 - API Development
 - Database
-- MPC Integration
+- MCP Integration
 
 ### Blockchain Developer
 
@@ -196,7 +196,7 @@ git push
 
 ---
 
-# Day 6 - Wallet Connection
+# Day 6 - Wallet Connection ✅ DONE
 
 ## Tasks
 
@@ -383,7 +383,7 @@ git push
 
 ---
 
-# Day 13 - MPC Integration
+# Day 13 - MCP Integration
 
 ## Tasks
 
