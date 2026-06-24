@@ -246,7 +246,7 @@ git push
 
 ---
 
-# Day 8 - Smart Contract Testing
+# Day 8 - Smart Contract Testing ✅ DONE
 
 ## Tasks
 
